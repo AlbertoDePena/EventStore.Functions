@@ -1,0 +1,1 @@
+# Event Store Azure Function App
