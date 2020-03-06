@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EventStore.Core.DTOs
+namespace EventStore.Models
 {
     public class Event
     {

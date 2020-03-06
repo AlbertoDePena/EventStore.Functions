@@ -1,6 +1,6 @@
 using EventStore.Core.Commands;
 using EventStore.Core.Contracts;
-using EventStore.Core.DTOs;
+using EventStore.Models;
 using EventStore.Core.Queries;
 using EventStore.Repository.Contracts;
 using FluentValidation;

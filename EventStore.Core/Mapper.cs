@@ -1,4 +1,6 @@
-﻿namespace EventStore.Core.DTOs
+﻿using EventStore.Models;
+
+namespace EventStore.Core
 {
     public static class Mapper
     {

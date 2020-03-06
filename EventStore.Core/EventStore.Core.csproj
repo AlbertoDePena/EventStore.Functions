@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EventStore.Models\EventStore.Models.csproj" />
     <ProjectReference Include="..\EventStore.Repository\EventStore.Repository.csproj" />
   </ItemGroup>
 

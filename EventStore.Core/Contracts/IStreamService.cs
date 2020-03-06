@@ -1,5 +1,5 @@
 using EventStore.Core.Commands;
-using EventStore.Core.DTOs;
+using EventStore.Models;
 using EventStore.Core.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;

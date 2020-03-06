@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Net;
 using System.Linq;
 using EventStore.Core.Commands;
-using System.Collections.Generic;
+using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -41,21 +41,5 @@ namespace EventStore.Functions.Middlewares
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
         }
-    }
-
-    public class AppendEvents
-    {
-        public int ExpectedVersion { get; set; }
-
-        public IEnumerable<NewEvent> Events { get; set; } = Enumerable.Empty<NewEvent>();
-
-        public string StreamName { get; set; }
-    }
-
-    public class NewEvent
-    { 
-        public string Type { get; set; }
-
-        public string Data { get; set; }
     }
 }
