@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EventStore.Functions.Handlers;
+using EventStore.Functions.Middlewares;
 
 namespace EventStore.Functions
 {
@@ -35,7 +35,7 @@ namespace EventStore.Functions
             // Order of middleware matters!!!
             _pipeline.Register(_factory.Create<CorsMiddleware>());
             _pipeline.Register(_factory.Create<SecurityMiddleware>());
-            _pipeline.Register(_factory.Create<StreamsHandler>());
+            _pipeline.Register(_factory.Create<StreamsMiddleware>());
 
             return await _pipeline.ExecuteAsync(context);
         }

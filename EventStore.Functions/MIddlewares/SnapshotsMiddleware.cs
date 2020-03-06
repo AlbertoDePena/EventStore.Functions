@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace EventStore.Functions.Handlers
+namespace EventStore.Functions.Middlewares
 {
-    public class SnapshotsHandler : HttpMiddleware
+    public class SnapshotsMiddleware : HttpMiddleware
     {
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {

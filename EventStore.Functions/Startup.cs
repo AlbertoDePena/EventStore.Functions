@@ -2,7 +2,7 @@ using System;
 using Numaka.Functions.Infrastructure;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using EventStore.Functions.Handlers;
+using EventStore.Functions.Middlewares;
 using EventStore.Core.Contracts;
 using EventStore.Core;
 using Numaka.Common.Contracts;
@@ -40,9 +40,9 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<CorsMiddleware>();
             builder.Services.AddSingleton<SecurityMiddleware>();           
             builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(metadataAddress, clientId));
-            builder.Services.AddSingleton<StreamsHandler>();
-            builder.Services.AddSingleton<EventsHandler>();
-            builder.Services.AddSingleton<SnapshotsHandler>();      
+            builder.Services.AddSingleton<StreamsMiddleware>();
+            builder.Services.AddSingleton<EventsMiddleware>();
+            builder.Services.AddSingleton<SnapshotsMiddleware>();      
             builder.Services.AddSingleton<IHttpFunctionContextBootstrapper, HttpFunctionContextBootstrapper>();
             builder.Services.AddSingleton<IHttpMiddlewareFactory, HttpMiddlewareFactory>();
 

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace EventStore.Functions.Handlers
+namespace EventStore.Functions.Middlewares
 {
-    public class EventsHandler : HttpMiddleware
+    public class EventsMiddleware : HttpMiddleware
     {
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {

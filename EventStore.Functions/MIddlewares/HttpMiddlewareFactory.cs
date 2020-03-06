@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Numaka.Functions.Infrastructure;
 
-namespace EventStore.Functions.Handlers
+namespace EventStore.Functions.Middlewares
 {
     public class HttpMiddlewareFactory : IHttpMiddlewareFactory
     {

@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using System;
 using EventStore.Core.Contracts;
 
-namespace EventStore.Functions.Handlers
+namespace EventStore.Functions.Middlewares
 {
-    public class StreamsHandler : HttpMiddleware
+    public class StreamsMiddleware : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public StreamsHandler(IStreamService streamService)
+        public StreamsMiddleware(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
