@@ -1,6 +1,6 @@
 using EventStore.Repository.Contracts;
 using Numaka.Common.Contracts;
-using Numaka.Common.Data;
+using Numaka.Common;
 
 namespace EventStore.Repository
 {

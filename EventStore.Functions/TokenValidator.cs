@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System;
 using Numaka.Common;
 using System.Threading;
+using Numaka.Common.Exceptions;
 
 namespace EventStore.Functions
 {
@@ -35,10 +36,16 @@ namespace EventStore.Functions
 
         public Task<ClaimsPrincipal> ValidateAsync(string bearerToken)
         {
-            // TODO: wrap on custom exception; TokenValidationException...
-            var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(bearerToken, _tokenValidationParameters, out _);
+            try
+            {
+                var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(bearerToken, _tokenValidationParameters, out _);
 
-            return Task.FromResult(claimsPrincipal);
+                return Task.FromResult(claimsPrincipal);
+            }
+            catch (Exception e)
+            {
+                throw new TokenValidationException("Failed to validate bearer token", e);
+            }
         }
     }
 }
