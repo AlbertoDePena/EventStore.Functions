@@ -11,8 +11,7 @@ RUN cd /src/EventStore.Functions && \
 
 FROM mcr.microsoft.com/azure-functions/dotnet:3.0
 
-ENV FUNCTIONS_V2_COMPATIBILITY_MODE=true \
-    AzureWebJobsStorage="" \
+ENV AzureWebJobsStorage="UseDevelopmentStorage=true" \
     METADATA_ADDRESS="" \
     CLIENT_ID="" \
     DB_CONNECTION_STRING=""
