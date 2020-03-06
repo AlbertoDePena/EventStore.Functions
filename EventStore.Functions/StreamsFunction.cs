@@ -13,9 +13,9 @@ namespace EventStore.Functions
     {
         private readonly IHttpFunctionContextBootstrapper _bootstrapper;
         private readonly IMiddlewarePipeline _pipeline;
-        private readonly IHandlerFactory _factory;
+        private readonly IHttpMiddlewareFactory _factory;
 
-        public StreamsFunction(IHttpFunctionContextBootstrapper bootstrapper, IMiddlewarePipeline pipeline, IHandlerFactory factory)
+        public StreamsFunction(IHttpFunctionContextBootstrapper bootstrapper, IMiddlewarePipeline pipeline, IHttpMiddlewareFactory factory)
         {
             _bootstrapper = bootstrapper ?? throw new ArgumentNullException(nameof(bootstrapper));
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));

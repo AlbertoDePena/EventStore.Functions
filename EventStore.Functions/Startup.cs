@@ -44,7 +44,7 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<EventsHandler>();
             builder.Services.AddSingleton<SnapshotsHandler>();      
             builder.Services.AddSingleton<IHttpFunctionContextBootstrapper, HttpFunctionContextBootstrapper>();
-            builder.Services.AddSingleton<IHandlerFactory, HandlerFactory>();
+            builder.Services.AddSingleton<IHttpMiddlewareFactory, HttpMiddlewareFactory>();
 
             builder.Services.AddTransient<Core.Contracts.IValidatorFactory, ValidatorFactory>();
             builder.Services.AddTransient<IStreamService, StreamService>();

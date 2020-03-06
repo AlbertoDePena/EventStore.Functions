@@ -4,11 +4,11 @@ using Numaka.Functions.Infrastructure;
 
 namespace EventStore.Functions.Handlers
 {
-    public class HandlerFactory : IHandlerFactory
+    public class HttpMiddlewareFactory : IHttpMiddlewareFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public HandlerFactory(IServiceProvider serviceProvider)
+        public HttpMiddlewareFactory(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
