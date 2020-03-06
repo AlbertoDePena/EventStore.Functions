@@ -1,6 +1,7 @@
 using Numaka.Functions.Infrastructure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
@@ -11,33 +12,34 @@ namespace EventStore.Functions
 {
     public class EventsFunction
     {
-        private readonly IHttpFunctionContextBootstrapper _bootstrapper;
-        private readonly IMiddlewarePipeline _pipeline;
-        private readonly IHttpMiddlewareFactory _factory;
+        private readonly IServiceProvider _serviceProvider;
 
-        public EventsFunction(IHttpFunctionContextBootstrapper bootstrapper, IMiddlewarePipeline pipeline, IHttpMiddlewareFactory factory)
+        public EventsFunction(IServiceProvider serviceProvider)
         {
-            _bootstrapper = bootstrapper ?? throw new ArgumentNullException(nameof(bootstrapper));
-            _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         [FunctionName("Events")]
         public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
         {
+            var bootstrapper = _serviceProvider.GetService<IHttpFunctionContextBootstrapper>();
+            var pipeline = _serviceProvider.GetService<IMiddlewarePipeline>();
+
             logger.LogInformation("Bootstrapping HTTP function context...");
 
-            var context = _bootstrapper.Bootstrap(request, logger);
+            var context = bootstrapper.Bootstrap(request, logger);
+
+            logger.LogInformation("Registering middlewares...");
+
+            // Order of middleware matters!!!
+            pipeline.Register(_serviceProvider.GetService<CorsMiddleware>());
+            pipeline.Register(_serviceProvider.GetService<SecurityMiddleware>());
+            pipeline.Register(_serviceProvider.GetService<EventsMiddleware>());
 
             logger.LogInformation("Executing request...");
 
-            // Order of middleware matters!!!
-            _pipeline.Register(_factory.Create<CorsMiddleware>());
-            _pipeline.Register(_factory.Create<SecurityMiddleware>());
-            _pipeline.Register(_factory.Create<EventsMiddleware>());
-
-            return await _pipeline.ExecuteAsync(context);
+            return await pipeline.ExecuteAsync(context);
         }
     }
 }
