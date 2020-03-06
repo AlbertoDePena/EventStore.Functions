@@ -40,10 +40,13 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<CorsMiddleware>();
             builder.Services.AddSingleton<SecurityMiddleware>();           
             builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(metadataAddress, clientId));
+
             builder.Services.AddSingleton<FindStreamMiddleware>();
             builder.Services.AddSingleton<GetAllStreamsMiddleware>();
             builder.Services.AddSingleton<GetEventsMiddleware>();
-            builder.Services.AddSingleton<GetSnapshotsMiddleware>();      
+            builder.Services.AddSingleton<GetSnapshotsMiddleware>();
+            builder.Services.AddSingleton<AppendEventsMiddleware>();
+
             builder.Services.AddSingleton<IHttpFunctionContextBootstrapper, HttpFunctionContextBootstrapper>();
 
             builder.Services.AddTransient<Core.Contracts.IValidatorFactory, ValidatorFactory>();
