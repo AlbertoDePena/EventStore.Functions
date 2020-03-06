@@ -1,6 +1,4 @@
-using EventStore.Core.Commands;
 using EventStore.Models;
-using EventStore.Core.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,18 +6,18 @@ namespace EventStore.Core.Contracts
 {
     public interface IStreamService
     {
-        Task AppendEventsAsync(AppendEventsCommand command);
+        Task AppendEventsAsync(AppendEvents model);
 
-        Task AddSnapshotAsync(AddSnapshotCommand command);
+        Task AddSnapshotAsync(AddSnapshot model);
 
-        Task DeleteSnapshotsAsync(DeleteSnapshotsCommand command);
+        Task DeleteSnapshotsAsync(QueryParameters model);
 
         Task<IEnumerable<Stream>> GetAllStreamsAsync();
 
-        Task<Stream> GetStreamAsync(StreamQuery query);
+        Task<Stream> GetStreamAsync(QueryParameters query);
 
-        Task<IEnumerable<Event>> GetEventsAsync(EventsQuery query);
+        Task<IEnumerable<Event>> GetEventsAsync(QueryParameters query);
 
-        Task<IEnumerable<Snapshot>> GetSnapshotsAsync(SnapshotsQuery query);
+        Task<IEnumerable<Snapshot>> GetSnapshotsAsync(QueryParameters query);
     }
 }

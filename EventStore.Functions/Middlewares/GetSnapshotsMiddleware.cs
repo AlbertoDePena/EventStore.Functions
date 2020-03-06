@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
-using EventStore.Core.Queries;
 using EventStore.Core.Contracts;
+using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -26,11 +26,11 @@ namespace EventStore.Functions.Middlewares
 
             var streamName = values.Get("streamName");
 
-            var query = new SnapshotsQuery(streamName);
+            var query = new QueryParameters { StreamName = streamName };
 
-            var dtos = await _streamService.GetSnapshotsAsync(query);
+            var models = await _streamService.GetSnapshotsAsync(query);
 
-            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, dtos);
+            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
         }
     }
 }

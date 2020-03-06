@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using EventStore.Core.Commands;
+using EventStore.Models;
 
 namespace EventStore.Core.Validators
 {
-    public class AddSnapshotCommandValidator : AbstractValidator<AddSnapshotCommand>
+    public class AddSnapshotValidator : AbstractValidator<AddSnapshot>
     {
-        public AddSnapshotCommandValidator()
+        public AddSnapshotValidator()
         {
             RuleFor(x => x.StreamName).NotEmpty().MaximumLength(256);
             RuleFor(x => x.Description).NotEmpty().MaximumLength(256);

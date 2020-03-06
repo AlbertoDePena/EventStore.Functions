@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
-using EventStore.Core.Commands;
 using System;
 using System.Linq;
+using EventStore.Models;
 
 namespace EventStore.Core.Validators
 {
-    public class AppendEventsCommandValidator : AbstractValidator<AppendEventsCommand>
+    public class AppendEventsValidator : AbstractValidator<AppendEvents>
     {
-        public AppendEventsCommandValidator(IValidator<NewEventCommand> newEventValidator)
+        public AppendEventsValidator(IValidator<NewEvent> newEventValidator)
         {
             if (newEventValidator == null) throw new ArgumentNullException(nameof(newEventValidator));
 

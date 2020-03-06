@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using EventStore.Core.Commands;
+using EventStore.Models;
 
 namespace EventStore.Core.Validators
 {
-    public class NewEventCommandValidator : AbstractValidator<NewEventCommand>
+    public class NewEventValidator : AbstractValidator<NewEvent>
     {
-        public NewEventCommandValidator()
+        public NewEventValidator()
         {
             RuleFor(x => x.Type).NotEmpty().MaximumLength(256);
             RuleFor(x => x.Data).NotEmpty();

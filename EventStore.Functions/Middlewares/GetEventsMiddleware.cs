@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 using EventStore.Core.Contracts;
-using EventStore.Core.Queries;
+using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -28,11 +28,11 @@ namespace EventStore.Functions.Middlewares
 
             int.TryParse(values.Get("startAtVersion"), out int startAtVersion);
 
-            var query = new EventsQuery(streamName, startAtVersion);
+            var query = new QueryParameters { StreamName = streamName, StartAtVersion = startAtVersion };
 
-            var dtos = await _streamService.GetEventsAsync(query);
+            var models = await _streamService.GetEventsAsync(query);
 
-            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, dtos);
+            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
         }
     }
 }

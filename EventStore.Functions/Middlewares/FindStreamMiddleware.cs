@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using System.Net.Http;
-using EventStore.Core.Queries;
 using System.Net;
+using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -26,13 +26,11 @@ namespace EventStore.Functions.Middlewares
 
             var streamName = values.Get("streamName");
 
-            var query = new StreamQuery(streamName);
+            var model = await _streamService.GetStreamAsync(new QueryParameters { StreamName = streamName });
 
-            var dto = await _streamService.GetStreamAsync(query);
-
-            context.Response = dto == null ?
+            context.Response = model == null ?
                 context.Request.CreateErrorResponse(HttpStatusCode.NotFound, $"Stream with name '{streamName}' not found") :
-                context.Request.CreateResponse(HttpStatusCode.OK, dto);
+                context.Request.CreateResponse(HttpStatusCode.OK, model);
         }
     }
 }

@@ -5,8 +5,6 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
-using System.Linq;
-using EventStore.Core.Commands;
 using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
@@ -24,20 +22,16 @@ namespace EventStore.Functions.Middlewares
         {
             context.Logger.LogInformation("Handling stream request...");
 
-            var dto = await context.Request.Content.ReadAsAsync<AppendEvents>();
+            var model = await context.Request.Content.ReadAsAsync<AppendEvents>();
 
-            if (dto == null)
+            if (model == null)
             {
                 context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid payload");
 
                 return;
             }
 
-            var events = dto.Events?.Select(e => new NewEventCommand(e.Type, e.Data));
-
-            var command = new AppendEventsCommand(dto.StreamName, dto.ExpectedVersion, events);
-
-            await _streamService.AppendEventsAsync(command);
+            await _streamService.AppendEventsAsync(model);
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
         }

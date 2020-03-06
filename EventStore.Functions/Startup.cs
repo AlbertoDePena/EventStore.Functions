@@ -7,12 +7,11 @@ using EventStore.Core.Contracts;
 using EventStore.Core;
 using Numaka.Common.Contracts;
 using FluentValidation;
-using EventStore.Core.Commands;
 using EventStore.Core.Validators;
-using EventStore.Core.Queries;
 using Numaka.Common;
 using EventStore.Repository;
 using EventStore.Repository.Contracts;
+using EventStore.Models;
 
 [assembly: FunctionsStartup(typeof(EventStore.Functions.Startup))]
 
@@ -26,14 +25,10 @@ namespace EventStore.Functions
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-            builder.Services.AddSingleton<IValidator<AddSnapshotCommand>, AddSnapshotCommandValidator>();
-            builder.Services.AddSingleton<IValidator<AppendEventsCommand>, AppendEventsCommandValidator>();
-            builder.Services.AddSingleton<IValidator<DeleteSnapshotsCommand>, DeleteSnapshotsCommandValidator>();
-            builder.Services.AddSingleton<IValidator<NewEventCommand>, NewEventCommandValidator>();
-
-            builder.Services.AddSingleton<IValidator<EventsQuery>, EventsQueryValidator>();
-            builder.Services.AddSingleton<IValidator<SnapshotsQuery>, SnapshotsQueryValidator>();
-            builder.Services.AddSingleton<IValidator<StreamQuery>, StreamQueryValidator>();
+            builder.Services.AddSingleton<IValidator<AddSnapshot>, AddSnapshotValidator>();
+            builder.Services.AddSingleton<IValidator<AppendEvents>, AppendEventsValidator>();
+            builder.Services.AddSingleton<IValidator<NewEvent>, NewEventValidator>();
+            builder.Services.AddSingleton<IValidator<QueryParameters>, QueryParametersValidator>();
 
             builder.Services.AddSingleton<IGuidFactory, GuidFactory>();
             builder.Services.AddSingleton<IDbConnectionFactory>(new SqlDbConnectionFactory(dbConnectionString));            

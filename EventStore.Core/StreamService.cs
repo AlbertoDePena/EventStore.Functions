@@ -1,7 +1,5 @@
-using EventStore.Core.Commands;
 using EventStore.Core.Contracts;
 using EventStore.Models;
-using EventStore.Core.Queries;
 using EventStore.Repository.Contracts;
 using FluentValidation;
 using Numaka.Common.Exceptions;
@@ -23,21 +21,21 @@ namespace EventStore.Core
             _validatorFactory = validatorFactory ?? throw new ArgumentNullException(nameof(validatorFactory));
         }
 
-        public async Task AddSnapshotAsync(AddSnapshotCommand command)
+        public async Task AddSnapshotAsync(AddSnapshot model)
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<AddSnapshotCommand>().ValidateAndThrowAsync(command);
+            await _validatorFactory.GetValidator<AddSnapshot>().ValidateAndThrowAsync(model);
 
-            var stream = await _unitOfWork.StreamRepository.GetStreamByNameAsync(command.StreamName);
+            var stream = await _unitOfWork.StreamRepository.GetStreamByNameAsync(model.StreamName);
 
-            if (stream == null) throw new KeyNotFoundException($"Stream not found with name {command.StreamName}");
+            if (stream == null) throw new KeyNotFoundException($"Stream not found with name {model.StreamName}");
 
             var snapshot = new Repository.Entities.Snapshot
             {
                 StreamId = stream.StreamId,
-                Description = command.Description,
-                Data = command.Data,
+                Description = model.Description,
+                Data = model.Data,
                 Version = stream.Version
             };
 
@@ -46,30 +44,30 @@ namespace EventStore.Core
             _unitOfWork.Commit();
         }
 
-        public async Task AppendEventsAsync(AppendEventsCommand command)
+        public async Task AppendEventsAsync(AppendEvents model)
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<AppendEventsCommand>().ValidateAndThrowAsync(command);
+            await _validatorFactory.GetValidator<AppendEvents>().ValidateAndThrowAsync(model);
 
-            var stream = await _unitOfWork.StreamRepository.GetStreamByNameAsync(command.StreamName);
+            var stream = await _unitOfWork.StreamRepository.GetStreamByNameAsync(model.StreamName);
 
             if (stream == null)
             {
                 stream = new Repository.Entities.Stream
                 {
-                    Name = command.StreamName,
+                    Name = model.StreamName,
                     Version = 0
                 };
 
                 await _unitOfWork.StreamRepository.AddStreamAsync(stream);
             }
 
-            if (stream.Version != command.ExpectedVersion)
-                throw new ConcurrencyException($"Concurrency error - expected stream version to be {stream.Version} but got {command.ExpectedVersion}");
+            if (stream.Version != model.ExpectedVersion)
+                throw new ConcurrencyException($"Concurrency error - expected stream version to be {stream.Version} but got {model.ExpectedVersion}");
 
             var events =
-                command.Events.Select(e => new Repository.Entities.Event
+                model.Events.Select(e => new Repository.Entities.Event
                 {
                     StreamId = stream.StreamId,
                     Type = e.Type,
@@ -83,13 +81,13 @@ namespace EventStore.Core
             _unitOfWork.Commit();
         }
 
-        public async Task DeleteSnapshotsAsync(DeleteSnapshotsCommand command)
+        public async Task DeleteSnapshotsAsync(QueryParameters model)
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<DeleteSnapshotsCommand>().ValidateAndThrowAsync(command);
+            await _validatorFactory.GetValidator<QueryParameters>().ValidateAndThrowAsync(model);
 
-            await _unitOfWork.StreamRepository.DeleteSnapshotsAsync(command.StreamName);
+            await _unitOfWork.StreamRepository.DeleteSnapshotsAsync(model.StreamName);
 
             _unitOfWork.Commit();
         }
@@ -101,35 +99,35 @@ namespace EventStore.Core
             return entities.Select(Mapper.FromEntity);
         }
 
-        public async Task<IEnumerable<Event>> GetEventsAsync(EventsQuery query)
+        public async Task<IEnumerable<Event>> GetEventsAsync(QueryParameters model)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<EventsQuery>().ValidateAndThrowAsync(query);
+            await _validatorFactory.GetValidator<QueryParameters>().ValidateAndThrowAsync(model);
 
-            var entities = await _unitOfWork.StreamRepository.GetEventsAsync(query.StreamName, query.StartAtVersion);
+            var entities = await _unitOfWork.StreamRepository.GetEventsAsync(model.StreamName, model.StartAtVersion.GetValueOrDefault());
 
             return entities.Select(Mapper.FromEntity);
         }
 
-        public async Task<IEnumerable<Snapshot>> GetSnapshotsAsync(SnapshotsQuery query)
+        public async Task<IEnumerable<Snapshot>> GetSnapshotsAsync(QueryParameters model)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<SnapshotsQuery>().ValidateAndThrowAsync(query);
+            await _validatorFactory.GetValidator<QueryParameters>().ValidateAndThrowAsync(model);
 
-            var entities = await _unitOfWork.StreamRepository.GetSnapshotsAsync(query.StreamName);
+            var entities = await _unitOfWork.StreamRepository.GetSnapshotsAsync(model.StreamName);
 
             return entities.Select(Mapper.FromEntity);
         }
 
-        public async Task<Stream> GetStreamAsync(StreamQuery query)
+        public async Task<Stream> GetStreamAsync(QueryParameters model)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            await _validatorFactory.GetValidator<StreamQuery>().ValidateAndThrowAsync(query);
+            await _validatorFactory.GetValidator<QueryParameters>().ValidateAndThrowAsync(model);
 
-            var entity = await _unitOfWork.StreamRepository.GetStreamByNameAsync(query.StreamName);
+            var entity = await _unitOfWork.StreamRepository.GetStreamByNameAsync(model.StreamName);
 
             if (entity == null)
             {

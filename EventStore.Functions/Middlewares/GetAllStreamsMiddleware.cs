@@ -21,9 +21,9 @@ namespace EventStore.Functions.Middlewares
         {
             context.Logger.LogInformation("Handling streams request...");
 
-            var dtos = await _streamService.GetAllStreamsAsync();
+            var models = await _streamService.GetAllStreamsAsync();
             
-            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, dtos);
+            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
         }
     }
 }
