@@ -9,13 +9,13 @@ using EventStore.Functions.Handlers;
 
 namespace EventStore.Functions
 {
-    public class Functions
+    public class StreamsFunction
     {
         private readonly IHttpFunctionContextBootstrapper _bootstrapper;
         private readonly IMiddlewarePipeline _pipeline;
         private readonly IHandlerFactory _factory;
 
-        public Functions(IHttpFunctionContextBootstrapper bootstrapper, IMiddlewarePipeline pipeline, IHandlerFactory factory)
+        public StreamsFunction(IHttpFunctionContextBootstrapper bootstrapper, IMiddlewarePipeline pipeline, IHandlerFactory factory)
         {
             _bootstrapper = bootstrapper ?? throw new ArgumentNullException(nameof(bootstrapper));
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
@@ -23,21 +23,8 @@ namespace EventStore.Functions
         }
 
         [FunctionName("Streams")]
-        public Task<HttpResponseMessage> GetStreams(
+        public async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync<StreamsHandler>(request, logger);
-
-        [FunctionName("Events")]
-        public Task<HttpResponseMessage> GetEvents(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync<EventsHandler>(request, logger);
-
-        [FunctionName("Snapshots")]
-        public Task<HttpResponseMessage> GetSnapshots(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync<SnapshotsHandler>(request, logger);
-
-        private async Task<HttpResponseMessage> ExecuteAsync<THttpMiddleware>(HttpRequestMessage request, ILogger logger) where THttpMiddleware : HttpMiddleware
         {
             logger.LogInformation("Bootstrapping HTTP function context...");
 
@@ -48,7 +35,7 @@ namespace EventStore.Functions
             // Order of middleware matters!!!
             _pipeline.Register(_factory.Create<CorsMiddleware>());
             _pipeline.Register(_factory.Create<SecurityMiddleware>());
-            _pipeline.Register(_factory.Create<THttpMiddleware>());
+            _pipeline.Register(_factory.Create<StreamsHandler>());
 
             return await _pipeline.ExecuteAsync(context);
         }
