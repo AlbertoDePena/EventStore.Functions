@@ -3,7 +3,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace EventStore.Core
+namespace EventStore.Core.Validators
 {
     public class ValidatorFactory : Contracts.IValidatorFactory
     {
