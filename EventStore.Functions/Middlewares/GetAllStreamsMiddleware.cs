@@ -19,7 +19,7 @@ namespace EventStore.Functions.Middlewares
 
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {
-            context.Logger.LogInformation("Handling streams request...");
+            context.Logger.LogInformation("Getting all streams...");
 
             var models = await _streamService.GetAllStreamsAsync();
             

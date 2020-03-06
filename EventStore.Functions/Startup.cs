@@ -41,6 +41,8 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<GetEventsMiddleware>();
             builder.Services.AddSingleton<GetSnapshotsMiddleware>();
             builder.Services.AddSingleton<AppendEventsMiddleware>();
+            builder.Services.AddSingleton<AddSnapshotMiddleware>();
+            builder.Services.AddSingleton<DeleteSnapshotsMiddleware>();
 
             builder.Services.AddSingleton<IHttpFunctionContextBootstrapper, HttpFunctionContextBootstrapper>();
 

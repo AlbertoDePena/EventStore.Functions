@@ -9,28 +9,28 @@ using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class FindStreamMiddleware : HttpMiddleware
+    public class DeleteSnapshotsMiddleware : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public FindStreamMiddleware(IStreamService streamService)
+        public DeleteSnapshotsMiddleware(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
 
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {
-            context.Logger.LogInformation("Finding stream...");
+            context.Logger.LogInformation("Deleting snapshots...");
 
             var values = context.Request.RequestUri.ParseQueryString();
 
             var streamName = values.Get("streamName");
 
-            var model = await _streamService.GetStreamAsync(new QueryParameters { StreamName = streamName });
+            var query = new QueryParameters { StreamName = streamName };
 
-            context.Response = model == null ?
-                context.Request.CreateErrorResponse(HttpStatusCode.NotFound, $"Stream with name '{streamName}' not found") :
-                context.Request.CreateResponse(HttpStatusCode.OK, model);
+            await _streamService.DeleteSnapshotsAsync(query);
+
+            context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
         }
     }
 }

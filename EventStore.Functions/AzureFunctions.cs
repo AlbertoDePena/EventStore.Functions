@@ -44,6 +44,16 @@ namespace EventStore.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "POST", "OPTIONS", Route = "append-events")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<AppendEventsMiddleware>(request, logger);
 
+        [FunctionName("AddSnapshot")]
+        public Task<HttpResponseMessage> AddSnapshot(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", "OPTIONS", Route = "add-snapshot")] HttpRequestMessage request, ILogger logger)
+            => ExecuteAsync<AddSnapshotMiddleware>(request, logger);
+
+        [FunctionName("DeleteSnapshots")]
+        public Task<HttpResponseMessage> DeleteSnapshots(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "DELETE", "OPTIONS", Route = "delete-snapshots")] HttpRequestMessage request, ILogger logger)
+            => ExecuteAsync<DeleteSnapshotsMiddleware>(request, logger);
+
         private async Task<HttpResponseMessage> ExecuteAsync<TMiddleware>(HttpRequestMessage request, ILogger logger) where TMiddleware : HttpMiddleware
         {
             var bootstrapper = _serviceProvider.GetService<IHttpFunctionContextBootstrapper>();

@@ -9,20 +9,20 @@ using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class AppendEventsMiddleware : HttpMiddleware
+    public class AddSnapshotMiddleware : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public AppendEventsMiddleware(IStreamService streamService)
+        public AddSnapshotMiddleware(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
 
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {
-            context.Logger.LogInformation("Appending events...");
+            context.Logger.LogInformation("Adding snapshot...");
 
-            var model = await context.Request.Content.ReadAsAsync<AppendEvents>();
+            var model = await context.Request.Content.ReadAsAsync<AddSnapshot>();
 
             if (model == null)
             {
@@ -31,7 +31,7 @@ namespace EventStore.Functions.Middlewares
                 return;
             }
 
-            await _streamService.AppendEventsAsync(model);
+            await _streamService.AddSnapshotAsync(model);
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
         }

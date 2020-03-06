@@ -20,7 +20,7 @@ namespace EventStore.Functions.Middlewares
 
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {
-            context.Logger.LogInformation("Handling snapshots request...");
+            context.Logger.LogInformation("Getting snapshots...");
 
             var values = context.Request.RequestUri.ParseQueryString();
 
