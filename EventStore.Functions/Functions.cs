@@ -23,18 +23,21 @@ namespace EventStore.Functions
         }
 
         [FunctionName("Streams")]
-        public Task<HttpResponseMessage> GetStreams([HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync(request, logger, _factory.Create<StreamsHandler>());
+        public Task<HttpResponseMessage> GetStreams(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
+            => ExecuteAsync<StreamsHandler>(request, logger);
 
         [FunctionName("Events")]
-        public Task<HttpResponseMessage> GetEvents([HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync(request, logger, _factory.Create<EventsHandler>());
+        public Task<HttpResponseMessage> GetEvents(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
+            => ExecuteAsync<EventsHandler>(request, logger);
 
         [FunctionName("Snapshots")]
-        public Task<HttpResponseMessage> GetSnapshots([HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
-            => ExecuteAsync(request, logger, _factory.Create<SnapshotsHandler>());
+        public Task<HttpResponseMessage> GetSnapshots(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
+            => ExecuteAsync<SnapshotsHandler>(request, logger);
 
-        private async Task<HttpResponseMessage> ExecuteAsync(HttpRequestMessage request, ILogger logger, HttpMiddleware middleware)
+        private async Task<HttpResponseMessage> ExecuteAsync<THttpMiddleware>(HttpRequestMessage request, ILogger logger) where THttpMiddleware : HttpMiddleware
         {
             logger.LogInformation("Bootstrapping HTTP function context...");
 
@@ -42,7 +45,10 @@ namespace EventStore.Functions
 
             logger.LogInformation("Executing request...");
 
-            _pipeline.Register(middleware);
+            // Order of middleware matters!!!
+            _pipeline.Register(_factory.Create<CorsMiddleware>());
+            _pipeline.Register(_factory.Create<SecurityMiddleware>());
+            _pipeline.Register(_factory.Create<THttpMiddleware>());
 
             return await _pipeline.ExecuteAsync(context);
         }

@@ -49,16 +49,7 @@ namespace EventStore.Functions
             builder.Services.AddTransient<Core.Contracts.IValidatorFactory, ValidatorFactory>();
             builder.Services.AddTransient<IStreamService, StreamService>();
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddTransient<IMiddlewarePipeline>(provider =>
-            {
-                var pipeline = new MiddlewarePipeline();
-
-                // Order of middleware matters!!!
-                pipeline.Register(provider.GetService<CorsMiddleware>());
-                pipeline.Register(provider.GetService<SecurityMiddleware>());
-
-                return pipeline;
-            });
+            builder.Services.AddTransient<IMiddlewarePipeline, MiddlewarePipeline>();
         }
     }
 }
