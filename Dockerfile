@@ -11,7 +11,9 @@ RUN cd /src/EventStore.Functions && \
 
 FROM mcr.microsoft.com/azure-functions/dotnet:3.0
 
-ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
-    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+ENV AzureWebJobsStorage="" \
+    METADATA_ADDRESS="" \
+    CLIENT_ID="" \
+    DB_CONNECTION_STRING=""
 
 COPY --from=installer-env ["/home/site/wwwroot", "/home/site/wwwroot"]
