@@ -1,4 +1,4 @@
-using Numaka.Functions.Infrastructure;
+﻿using Numaka.Functions.Infrastructure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,18 +10,18 @@ using EventStore.Functions.Middlewares;
 
 namespace EventStore.Functions
 {
-    public class SnapshotsFunction
+    public class FindStreamFunction
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public SnapshotsFunction(IServiceProvider serviceProvider)
+        public FindStreamFunction(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        [FunctionName("Snapshots")]
+        [FunctionName("FindStream")]
         public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "stream")] HttpRequestMessage request, ILogger logger)
         {
             var bootstrapper = _serviceProvider.GetService<IHttpFunctionContextBootstrapper>();
             var pipeline = _serviceProvider.GetService<IMiddlewarePipeline>();
@@ -35,7 +35,7 @@ namespace EventStore.Functions
             // Order of middleware matters!!!
             pipeline.Register(_serviceProvider.GetService<CorsMiddleware>());
             pipeline.Register(_serviceProvider.GetService<SecurityMiddleware>());
-            pipeline.Register(_serviceProvider.GetService<SnapshotsMiddleware>());
+            pipeline.Register(_serviceProvider.GetService<FindStreamMiddleware>());
 
             logger.LogInformation("Executing request...");
 

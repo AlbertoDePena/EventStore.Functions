@@ -10,18 +10,18 @@ using EventStore.Functions.Middlewares;
 
 namespace EventStore.Functions
 {
-    public class EventsFunction
+    public class GetSnapshotsFunction
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public EventsFunction(IServiceProvider serviceProvider)
+        public GetSnapshotsFunction(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        [FunctionName("Events")]
+        [FunctionName("GetSnapshots")]
         public async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "snapshots")] HttpRequestMessage request, ILogger logger)
         {
             var bootstrapper = _serviceProvider.GetService<IHttpFunctionContextBootstrapper>();
             var pipeline = _serviceProvider.GetService<IMiddlewarePipeline>();
@@ -35,7 +35,7 @@ namespace EventStore.Functions
             // Order of middleware matters!!!
             pipeline.Register(_serviceProvider.GetService<CorsMiddleware>());
             pipeline.Register(_serviceProvider.GetService<SecurityMiddleware>());
-            pipeline.Register(_serviceProvider.GetService<EventsMiddleware>());
+            pipeline.Register(_serviceProvider.GetService<GetSnapshotsMiddleware>());
 
             logger.LogInformation("Executing request...");
 

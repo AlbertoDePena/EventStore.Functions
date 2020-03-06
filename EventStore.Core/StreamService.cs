@@ -131,6 +131,11 @@ namespace EventStore.Core
 
             var entity = await _unitOfWork.StreamRepository.GetStreamByNameAsync(query.StreamName);
 
+            if (entity == null)
+            {
+                return null;
+            }
+
             return entity.FromEntity();
         }
     }
