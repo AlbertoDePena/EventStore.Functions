@@ -5,7 +5,7 @@ COPY ./EventStore.Models /src/EventStore.Models
 COPY ./EventStore.Core /src/EventStore.Core
 COPY ./EventStore.Functions /src/EventStore.Functions
 
-RUN cd /EventStore.Functions && \
+RUN cd /src/EventStore.Functions && \
     mkdir -p /home/site/wwwroot && \
     dotnet publish *.csproj --configuration Release --output /home/site/wwwroot
 
