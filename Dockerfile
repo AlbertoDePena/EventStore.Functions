@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS installer-env
 
 COPY ./EventStore.Repository /src/EventStore.Repository
+COPY ./EventStore.Models /src/EventStore.Models
 COPY ./EventStore.Core /src/EventStore.Core
 COPY ./EventStore.Functions /src/EventStore.Functions
 
