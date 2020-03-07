@@ -21,22 +21,22 @@ namespace EventStore.Functions
 
         [FunctionName("GetSnapshots")]
         public Task<HttpResponseMessage> GetSnapshots(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "snapshots")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "get-snapshots")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetSnapshotsMiddleware>(request, logger);
 
         [FunctionName("GetEvents")]
         public Task<HttpResponseMessage> GetEvents(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "events")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "get-events")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetEventsMiddleware>(request, logger);
 
         [FunctionName("FindStream")]
         public Task<HttpResponseMessage> FindStream(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "stream")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "find-stream")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<FindStreamMiddleware>(request, logger);
 
         [FunctionName("GetAllStreams")]
         public Task<HttpResponseMessage> GetAllStreams(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "streams")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", "OPTIONS", Route = "get-all-streams")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetAllStreamsMiddleware>(request, logger);
 
         [FunctionName("AppendEvents")]
