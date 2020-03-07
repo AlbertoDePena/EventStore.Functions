@@ -13,7 +13,7 @@ FROM mcr.microsoft.com/azure-functions/dotnet:3.0
 
 ENV AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
     AzureWebJobsStorage="UseDevelopmentStorage=true" \
-    METADATA_ADDRESS="" \
+    OPEN_ID_CONNECT_METADATA_ADDRESS="" \
     CLIENT_ID="" \
     DB_CONNECTION_STRING=""
 

@@ -21,7 +21,7 @@ namespace EventStore.Functions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var metadataAddress = Environment.GetEnvironmentVariable("METADATA_ADDRESS");
+            var metadataAddress = Environment.GetEnvironmentVariable("OPEN_ID_CONNECT_METADATA_ADDRESS");
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
