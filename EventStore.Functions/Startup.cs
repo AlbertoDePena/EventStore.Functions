@@ -33,6 +33,7 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<IGuidFactory, GuidFactory>();
             builder.Services.AddSingleton<IDbConnectionFactory>(new SqlDbConnectionFactory(dbConnectionString));            
             builder.Services.AddSingleton<CorsMiddleware>();
+            builder.Services.AddSingleton<ExceptionMiddleware>();   
             builder.Services.AddSingleton<SecurityMiddleware>();           
             builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(metadataAddress, clientId));
 

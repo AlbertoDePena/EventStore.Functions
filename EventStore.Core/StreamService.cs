@@ -29,7 +29,7 @@ namespace EventStore.Core
 
             var stream = await _unitOfWork.StreamRepository.GetStreamByNameAsync(model.StreamName);
 
-            if (stream == null) throw new KeyNotFoundException($"Stream not found with name {model.StreamName}");
+            if (stream == null) throw new EntityNotFoundException($"Stream not found with name {model.StreamName}");
 
             var snapshot = new Repository.Entities.Snapshot
             {
