@@ -8,7 +8,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System;
 using Numaka.Common;
 using System.Threading;
-using Numaka.Common.Exceptions;
 
 namespace EventStore.Functions
 {
@@ -16,12 +15,12 @@ namespace EventStore.Functions
     {
         private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public TokenValidator(string metadataAddress, string clientId)
+        public TokenValidator(string openIdConnectMetadataAddress, string clientId)
         {
-            if (string.IsNullOrWhiteSpace(metadataAddress)) throw new ArgumentNullException(nameof(metadataAddress));
+            if (string.IsNullOrWhiteSpace(openIdConnectMetadataAddress)) throw new ArgumentNullException(nameof(openIdConnectMetadataAddress));
             if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentNullException(nameof(clientId));
 
-            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataAddress, new OpenIdConnectConfigurationRetriever());
+            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(openIdConnectMetadataAddress, new OpenIdConnectConfigurationRetriever());
             var configuration = AsyncHelper.RunSync(async () => await configurationManager.GetConfigurationAsync(CancellationToken.None));
 
             _tokenValidationParameters =
@@ -36,16 +35,9 @@ namespace EventStore.Functions
 
         public Task<ClaimsPrincipal> ValidateAsync(string bearerToken)
         {
-            try
-            {
-                var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(bearerToken, _tokenValidationParameters, out _);
+            var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(bearerToken, _tokenValidationParameters, out _);
 
-                return Task.FromResult(claimsPrincipal);
-            }
-            catch (Exception e)
-            {
-                throw new TokenValidationException("Failed to validate bearer token", e);
-            }
+            return Task.FromResult(claimsPrincipal);
         }
     }
 }

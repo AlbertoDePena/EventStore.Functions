@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
 using EventStore.Models;
+using Numaka.Common.Exceptions;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -28,9 +29,9 @@ namespace EventStore.Functions.Middlewares
 
             var model = await _streamService.GetStreamAsync(new QueryParameters { StreamName = streamName });
 
-            context.Response = model == null ?
-                context.Request.CreateErrorResponse(HttpStatusCode.NotFound, $"Stream with name '{streamName}' not found") :
-                context.Request.CreateResponse(HttpStatusCode.OK, model);
+            if (model == null) throw new EntityNotFoundException($"Stream with name '{streamName}' not found");
+                
+            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, model);
         }
     }
 }
