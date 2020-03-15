@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Numaka.EventStore.DbMigrator.SqlServer</AssemblyName>
+    <RootNamespace>Numaka.EventStore.DbMigrator.SqlServer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SqlScripts\1-Initial.sql" />
+    <EmbeddedResource Include="StoredProcedures\AddEvent.sql" />
+    <EmbeddedResource Include="StoredProcedures\AddSnapshot.sql" />
+    <EmbeddedResource Include="StoredProcedures\AddStream.sql" />
+    <EmbeddedResource Include="StoredProcedures\DeleteSnapshots.sql" />
+    <EmbeddedResource Include="StoredProcedures\GetAllStreams.sql" />
+    <EmbeddedResource Include="StoredProcedures\GetEvents.sql" />
+    <EmbeddedResource Include="StoredProcedures\GetSnapshots.sql" />
+    <EmbeddedResource Include="StoredProcedures\GetStreamByName.sql" />
+    <EmbeddedResource Include="StoredProcedures\UpdateStream.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="dbup-sqlserver" Version="4.2.0" />
+    <PackageReference Include="FSharp.Core" Version="4.7.0" />
+  </ItemGroup>
+  
+</Project>

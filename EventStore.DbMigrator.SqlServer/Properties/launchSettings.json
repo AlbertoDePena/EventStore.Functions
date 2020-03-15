@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DbMigrator.SqlServer": {
+      "commandName": "Project",
+      "environmentVariables": {        
+        "DB_CONNECTION_STRING": "Server=tcp:localhost,1433;Database=EventStore;User Id=sa;Password=P@55w0rd;"
+      }
+    }
+  }
+}
