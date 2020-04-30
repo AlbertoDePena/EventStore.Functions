@@ -41,17 +41,17 @@ namespace EventStore.Functions
 
         [FunctionName(nameof(AppendEvents))]
         public Task<HttpResponseMessage> AppendEvents(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", "options")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<AppendEventsHandler>(request, logger);
 
         [FunctionName(nameof(AddSnapshot))]
         public Task<HttpResponseMessage> AddSnapshot(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", "options")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<AddSnapshotHandler>(request, logger);
 
         [FunctionName(nameof(DeleteSnapshots))]
         public Task<HttpResponseMessage> DeleteSnapshots(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "DELETE", "options")] HttpRequestMessage request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<DeleteSnapshotsHandler>(request, logger);
 
         private async Task<HttpResponseMessage> ExecuteAsync<TMiddleware>(HttpRequestMessage request, ILogger logger) where TMiddleware : HttpMiddleware
