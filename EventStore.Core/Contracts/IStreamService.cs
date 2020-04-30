@@ -10,14 +10,14 @@ namespace EventStore.Core.Contracts
 
         Task AddSnapshotAsync(AddSnapshot model);
 
-        Task DeleteSnapshotsAsync(QueryParameters model);
+        Task DeleteSnapshotsAsync(string streamName);
 
         Task<IEnumerable<Stream>> GetAllStreamsAsync();
 
-        Task<Stream> GetStreamAsync(QueryParameters query);
+        Task<Stream> GetStreamAsync(string streamName);
 
-        Task<IEnumerable<Event>> GetEventsAsync(QueryParameters query);
+        Task<IEnumerable<Event>> GetEventsAsync(string streamName, int? startAtVersion);
 
-        Task<IEnumerable<Snapshot>> GetSnapshotsAsync(QueryParameters query);
+        Task<IEnumerable<Snapshot>> GetSnapshotsAsync(string streamName);
     }
 }

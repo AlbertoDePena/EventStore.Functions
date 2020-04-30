@@ -8,11 +8,11 @@ using EventStore.Core.Contracts;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class GetAllStreamsMiddleware : HttpMiddleware
+    public class GetAllStreamsHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public GetAllStreamsMiddleware(IStreamService streamService)
+        public GetAllStreamsHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }

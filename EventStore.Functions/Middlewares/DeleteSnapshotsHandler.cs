@@ -5,32 +5,29 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
-using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class DeleteSnapshotsMiddleware : HttpMiddleware
+    public class DeleteSnapshotsHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public DeleteSnapshotsMiddleware(IStreamService streamService)
+        public DeleteSnapshotsHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
 
         public override async Task InvokeAsync(IHttpFunctionContext context)
         {
-            context.Logger.LogInformation("Deleting snapshots...");
-
             var values = context.Request.RequestUri.ParseQueryString();
 
             var streamName = values.Get("streamName");
 
-            var query = new QueryParameters { StreamName = streamName };
-
-            await _streamService.DeleteSnapshotsAsync(query);
+            await _streamService.DeleteSnapshotsAsync(streamName);
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
+
+            context.Logger.LogInformation("Deleted snapshots for stream {streamName}", streamName);
         }
     }
 }
