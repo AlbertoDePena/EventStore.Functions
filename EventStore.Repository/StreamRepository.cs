@@ -16,9 +16,9 @@ namespace EventStore.Repository
     {
         private readonly Func<IDbConnection> _dbConnectionFunc;
         private readonly Func<IDbTransaction> _dbTransactionFunc;
-        private readonly IGuidFactory _guidFactory;
+        private readonly ISqlServerGuidFactory _guidFactory;
 
-        public StreamRepository(Func<IDbConnection> dbConnectionFunc, Func<IDbTransaction> dbTransactionFunc, IGuidFactory guidFactory)
+        public StreamRepository(Func<IDbConnection> dbConnectionFunc, Func<IDbTransaction> dbTransactionFunc, ISqlServerGuidFactory guidFactory)
         {
             _dbConnectionFunc = dbConnectionFunc ?? throw new ArgumentNullException(nameof(dbConnectionFunc));
             _dbTransactionFunc = dbTransactionFunc ?? throw new ArgumentNullException(nameof(dbTransactionFunc));

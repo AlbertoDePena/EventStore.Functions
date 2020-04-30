@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Properties\launchSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="SqlScripts\1-Initial.sql" />
     <EmbeddedResource Include="StoredProcedures\AddEvent.sql" />
     <EmbeddedResource Include="StoredProcedures\AddSnapshot.sql" />
@@ -23,6 +27,11 @@
     <EmbeddedResource Include="StoredProcedures\GetSnapshots.sql" />
     <EmbeddedResource Include="StoredProcedures\GetStreamByName.sql" />
     <EmbeddedResource Include="StoredProcedures\UpdateStream.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Dockerfile" />
+    <None Include="README.md" />
   </ItemGroup>
   
   <ItemGroup>

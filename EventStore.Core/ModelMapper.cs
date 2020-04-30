@@ -2,7 +2,7 @@
 
 namespace EventStore.Core
 {
-    public static class Mapper
+    public static class ModelMapper
     {
         public static Stream FromEntity(this Repository.Entities.Stream entity)
             => new Stream { Name = entity.Name, Version = entity.Version, CreatedAt = entity.CreatedAt, UpdatedAt = entity.UpdatedAt };

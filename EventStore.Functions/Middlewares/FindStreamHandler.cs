@@ -5,16 +5,15 @@ using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
-using EventStore.Models;
 using Numaka.Common.Exceptions;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class FindStreamMiddleware : HttpMiddleware
+    public class FindStreamHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public FindStreamMiddleware(IStreamService streamService)
+        public FindStreamHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
@@ -27,7 +26,7 @@ namespace EventStore.Functions.Middlewares
 
             var streamName = values.Get("streamName");
 
-            var model = await _streamService.GetStreamAsync(new QueryParameters { StreamName = streamName });
+            var model = await _streamService.GetStreamAsync(streamName);
 
             if (model == null) throw new EntityNotFoundException($"Stream with name '{streamName}' not found");
                 

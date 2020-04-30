@@ -23,31 +23,27 @@ namespace EventStore.Functions.Middlewares
             }
             catch (EntityNotFoundException entityNotFoundEx)
             {
-                var value = new { entityNotFoundEx.Message };
-
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotFound, JsonConvert.SerializeObject(value));
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotFound, entityNotFoundEx.Message);
             }
             catch (ValidationException validationEx)
             {
                 var errors = validationEx.Errors.Select(e => new { e.ErrorMessage, e.PropertyName });
 
-                var value = new { Message = "Entity validation errors. See 'errors' property for more details", Errors = errors };
+                var model = new { Description = "Entity validation errors. See 'errors' property for more details", Errors = errors };
 
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, JsonConvert.SerializeObject(value));
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, JsonConvert.SerializeObject(model));
             }
             catch (ConcurrencyException concurrencyEx)
             {
-                var value = new { concurrencyEx.Message };
-
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.Conflict, JsonConvert.SerializeObject(value));
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.Conflict, concurrencyEx.Message);
             }
             catch (RepositoryException repositoryEx)
             {
                 context.Logger.LogError(repositoryEx, repositoryEx.Message);
 
-                var value = new { Message = "Something went terribly wrong. Please contact the system administrator." };
+                const string message = "Something went terribly wrong. Please contact the system administrator.";
 
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, JsonConvert.SerializeObject(value));
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
     }

@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 using EventStore.Core.Contracts;
-using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class GetEventsMiddleware : HttpMiddleware
+    public class GetEventsHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public GetEventsMiddleware(IStreamService streamService)
+        public GetEventsHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
@@ -28,9 +27,7 @@ namespace EventStore.Functions.Middlewares
 
             int.TryParse(values.Get("startAtVersion"), out int startAtVersion);
 
-            var query = new QueryParameters { StreamName = streamName, StartAtVersion = startAtVersion };
-
-            var models = await _streamService.GetEventsAsync(query);
+            var models = await _streamService.GetEventsAsync(streamName, startAtVersion);
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
         }

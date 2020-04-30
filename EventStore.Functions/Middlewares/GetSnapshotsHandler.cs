@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 using EventStore.Core.Contracts;
-using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class GetSnapshotsMiddleware : HttpMiddleware
+    public class GetSnapshotsHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public GetSnapshotsMiddleware(IStreamService streamService)
+        public GetSnapshotsHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
@@ -26,9 +25,7 @@ namespace EventStore.Functions.Middlewares
 
             var streamName = values.Get("streamName");
 
-            var query = new QueryParameters { StreamName = streamName };
-
-            var models = await _streamService.GetSnapshotsAsync(query);
+            var models = await _streamService.GetSnapshotsAsync(streamName);
 
             context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
         }

@@ -9,11 +9,11 @@ using EventStore.Models;
 
 namespace EventStore.Functions.Middlewares
 {
-    public class AppendEventsMiddleware : HttpMiddleware
+    public class AppendEventsHandler : HttpMiddleware
     {
         private readonly IStreamService _streamService;
 
-        public AppendEventsMiddleware(IStreamService streamService)
+        public AppendEventsHandler(IStreamService streamService)
         {
             _streamService = streamService ?? throw new ArgumentNullException(nameof(streamService));
         }
