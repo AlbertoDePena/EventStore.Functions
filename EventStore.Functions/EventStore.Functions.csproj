@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
     <!--Start function app-->
     <StartAction>Program</StartAction>
     <StartProgram>$(APPDATA)\npm\node_modules\azure-functions-core-tools\bin\func.exe</StartProgram>
@@ -12,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Aliencube.AzureFunctions.Extensions.OpenApi" Version="1.5.4" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.5.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.6" />
     <PackageReference Include="Numaka.Functions.Infrastructure" Version="1.0.4" />
   </ItemGroup>

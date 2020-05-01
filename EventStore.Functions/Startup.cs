@@ -12,7 +12,6 @@ using Numaka.Common;
 using EventStore.Repository;
 using EventStore.Repository.Contracts;
 using EventStore.Models;
-using System.Reflection;
 using Microsoft.OpenApi.Models;
 
 [assembly: FunctionsStartup(typeof(EventStore.Functions.Startup))]
@@ -37,7 +36,7 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<CorsMiddleware>();
             builder.Services.AddSingleton<ExceptionMiddleware>();   
             builder.Services.AddSingleton<SecurityMiddleware>();           
-            //builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(openIdConnectMetadataAddress, clientId));
+            builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(openIdConnectMetadataAddress, clientId));
 
             builder.Services.AddSingleton<FindStreamHandler>();
             builder.Services.AddSingleton<GetAllStreamsHandler>();
