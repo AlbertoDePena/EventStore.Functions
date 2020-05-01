@@ -12,6 +12,7 @@ using Numaka.Common;
 using EventStore.Repository;
 using EventStore.Repository.Contracts;
 using EventStore.Models;
+using Microsoft.OpenApi.Models;
 
 [assembly: FunctionsStartup(typeof(EventStore.Functions.Startup))]
 
@@ -24,6 +25,8 @@ namespace EventStore.Functions
             var openIdConnectMetadataAddress = Environment.GetEnvironmentVariable("OPEN_ID_CONNECT_METADATA_ADDRESS");
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            builder.Services.AddSingleton(new OpenApiAppSettings(openApiInfo: GetOpenApiInfo()));
 
             builder.Services.AddSingleton<IValidator<AddSnapshot>, AddSnapshotValidator>();
             builder.Services.AddSingleton<IValidator<AppendEvents>, AppendEventsValidator>();
@@ -51,6 +54,13 @@ namespace EventStore.Functions
             builder.Services.AddTransient<IStreamService, StreamService>();
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddTransient<IMiddlewarePipeline, MiddlewarePipeline>();
+
+            static OpenApiInfo GetOpenApiInfo() => new OpenApiInfo()
+            {
+                Title = "Event Store",
+                Description = "Event Store web API",
+                Version = "1.0"
+            };
         }
     }
 }

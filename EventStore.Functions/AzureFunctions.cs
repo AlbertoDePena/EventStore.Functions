@@ -7,6 +7,19 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using EventStore.Functions.Middlewares;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using System.Collections.Generic;
+using EventStore.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
+using Aliencube.AzureFunctions.Extensions.OpenApi;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Configurations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Extensions;
+using Microsoft.OpenApi;
+using System.Reflection;
 
 namespace EventStore.Functions
 {
@@ -20,39 +33,110 @@ namespace EventStore.Functions
         }
 
         [FunctionName(nameof(GetSnapshots))]
+        [OpenApiOperation("get-snapshots", "EventStore")]
+        [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Snapshot>), Description = "Get snapshots for the given stream")]
         public Task<HttpResponseMessage> GetSnapshots(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetSnapshotsHandler>(request, logger);
 
         [FunctionName(nameof(GetEvents))]
+        [OpenApiOperation("get-events", "EventStore")]
+        [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter(name: "startAtVersion", In = ParameterLocation.Query, Required = false, Type = typeof(int))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Event>))]
         public Task<HttpResponseMessage> GetEvents(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetEventsHandler>(request, logger);
 
         [FunctionName(nameof(FindStream))]
+        [OpenApiOperation("find-stream", "EventStore")]
+        [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Stream))]
         public Task<HttpResponseMessage> FindStream(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<FindStreamHandler>(request, logger);
 
         [FunctionName(nameof(GetAllStreams))]
+        [OpenApiOperation("get-all-streams", "EventStore")]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Stream>))]
         public Task<HttpResponseMessage> GetAllStreams(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<GetAllStreamsHandler>(request, logger);
 
         [FunctionName(nameof(AppendEvents))]
+        [OpenApiOperation("append-events", "EventStore")]
+        [OpenApiRequestBody("application/json", typeof(AppendEvents))]
+        [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
         public Task<HttpResponseMessage> AppendEvents(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<AppendEventsHandler>(request, logger);
 
         [FunctionName(nameof(AddSnapshot))]
+        [OpenApiOperation("add-snapshots", "EventStore")]
+        [OpenApiRequestBody("application/json", typeof(AddSnapshot))]
+        [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
         public Task<HttpResponseMessage> AddSnapshot(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<AddSnapshotHandler>(request, logger);
 
         [FunctionName(nameof(DeleteSnapshots))]
+        [OpenApiOperation("delete-snapshots", "EventStore")]
+        [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
         public Task<HttpResponseMessage> DeleteSnapshots(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "options")] HttpRequestMessage request, ILogger logger)
             => ExecuteAsync<DeleteSnapshotsHandler>(request, logger);
+
+        [FunctionName(nameof(RenderSwaggerDocument))]
+        [OpenApiIgnore]
+        public async Task<IActionResult> RenderSwaggerDocument(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/{version}.{format}")] HttpRequest request, string version, string format, ILogger logger)
+        {
+            logger.LogInformation("Configuring swagger document...");
+
+            var openApiSettings = _serviceProvider.GetService<OpenApiAppSettings>();
+
+            var filter = new RouteConstraintFilter();
+            var helper = new DocumentHelper(filter);
+            var document = new Document(helper);
+
+            var result = await document.InitialiseDocument()
+                                       .AddMetadata(openApiSettings.OpenApiInfo)
+                                       .AddServer(request, routePrefix: "api")
+                                       .Build(Assembly.GetExecutingAssembly(), new CamelCaseNamingStrategy())
+                                       .RenderAsync(GetVersion(version), GetFormat(format));
+
+            return new ContentResult()
+            {
+                Content = result,
+                ContentType = "application/json",
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+
+        [FunctionName(nameof(RenderSwaggerUI))]
+        [OpenApiIgnore]
+        public async Task<IActionResult> RenderSwaggerUI(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/ui/{version}.{format}")] HttpRequest request, string version, string format, ILogger logger)
+        {
+            logger.LogInformation("Configuring swagger UI...");
+
+            var openApiSettings = _serviceProvider.GetService<OpenApiAppSettings>();
+
+            var ui = new SwaggerUI();
+            var result = await ui.AddMetadata(openApiSettings.OpenApiInfo)
+                                 .AddServer(request, routePrefix: "api")
+                                 .BuildAsync()
+                                 .RenderAsync($"swagger/{version}.{format}", openApiSettings.SwaggerAuthKey);
+
+            return new ContentResult()
+            {
+                Content = result,
+                ContentType = "text/html",
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
 
         private async Task<HttpResponseMessage> ExecuteAsync<TMiddleware>(HttpRequestMessage request, ILogger logger) where TMiddleware : HttpMiddleware
         {
@@ -74,6 +158,38 @@ namespace EventStore.Functions
             logger.LogInformation("Executing request...");
 
             return await pipeline.ExecuteAsync(context);
+        }
+
+        private OpenApiSpecVersion GetVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                throw new ArgumentNullException(nameof(version));
+            }
+
+            if (version.Equals("v2", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return OpenApiSpecVersion.OpenApi2_0;
+            }
+
+            if (version.Equals("v3", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return OpenApiSpecVersion.OpenApi3_0;
+            }
+
+            throw new InvalidOperationException("Invalid Open API version");
+        }
+
+        private OpenApiFormat GetFormat(string format)
+        {
+            if (string.IsNullOrWhiteSpace(format))
+            {
+                throw new ArgumentNullException(nameof(format));
+            }
+
+            return Enum.TryParse(format, true, out OpenApiFormat result)
+                       ? result
+                       : throw new InvalidOperationException("Invalid Open API format");
         }
     }
 }
