@@ -27,8 +27,6 @@ namespace EventStore.Functions
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-            builder.Services.AddSingleton(new RenderOpenApiDocumentOptions(version: "v3", format: "Json", assembly: Assembly.GetExecutingAssembly()));
-            builder.Services.AddSingleton(new RenderSwaggerUIOptions());
             builder.Services.AddSingleton(new OpenApiAppSettings(openApiInfo: GetOpenApiInfo()));
 
             builder.Services.AddSingleton<IValidator<AddSnapshot>, AddSnapshotValidator>();
@@ -62,7 +60,7 @@ namespace EventStore.Functions
             {
                 Title = "Event Store",
                 Description = "Event Store web API",
-                Version = "0.1"
+                Version = "1.0"
             };
         }
     }

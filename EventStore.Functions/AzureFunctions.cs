@@ -18,6 +18,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Extensions;
+using Microsoft.OpenApi;
+using System.Reflection;
 
 namespace EventStore.Functions
 {
@@ -89,10 +91,11 @@ namespace EventStore.Functions
         [FunctionName(nameof(RenderSwaggerDocument))]
         [OpenApiIgnore]
         public async Task<IActionResult> RenderSwaggerDocument(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger.json")] HttpRequest request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/{version}.{format}")] HttpRequest request, string version, string format, ILogger logger)
         {
+            logger.LogInformation("Configuring swagger document...");
+
             var openApiSettings = _serviceProvider.GetService<OpenApiAppSettings>();
-            var docSettings = _serviceProvider.GetService<RenderOpenApiDocumentOptions>();
 
             var filter = new RouteConstraintFilter();
             var helper = new DocumentHelper(filter);
@@ -100,9 +103,9 @@ namespace EventStore.Functions
 
             var result = await document.InitialiseDocument()
                                        .AddMetadata(openApiSettings.OpenApiInfo)
-                                       .AddServer(request, docSettings.RoutePrefix)
-                                       .Build(docSettings.Assembly, new CamelCaseNamingStrategy())
-                                       .RenderAsync(docSettings.Version, docSettings.Format);
+                                       .AddServer(request, routePrefix: "api")
+                                       .Build(Assembly.GetExecutingAssembly(), new CamelCaseNamingStrategy())
+                                       .RenderAsync(GetVersion(version), GetFormat(format));
 
             return new ContentResult()
             {
@@ -115,16 +118,17 @@ namespace EventStore.Functions
         [FunctionName(nameof(RenderSwaggerUI))]
         [OpenApiIgnore]
         public async Task<IActionResult> RenderSwaggerUI(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/ui")] HttpRequest request, ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/ui/{version}.{format}")] HttpRequest request, string version, string format, ILogger logger)
         {
+            logger.LogInformation("Configuring swagger UI...");
+
             var openApiSettings = _serviceProvider.GetService<OpenApiAppSettings>();
-            var uiSettings = _serviceProvider.GetService<RenderSwaggerUIOptions>();
 
             var ui = new SwaggerUI();
             var result = await ui.AddMetadata(openApiSettings.OpenApiInfo)
-                                 .AddServer(request, uiSettings.RoutePrefix)
+                                 .AddServer(request, routePrefix: "api")
                                  .BuildAsync()
-                                 .RenderAsync(uiSettings.Endpoint, openApiSettings.SwaggerAuthKey);
+                                 .RenderAsync($"swagger/{version}.{format}", openApiSettings.SwaggerAuthKey);
 
             return new ContentResult()
             {
@@ -154,6 +158,38 @@ namespace EventStore.Functions
             logger.LogInformation("Executing request...");
 
             return await pipeline.ExecuteAsync(context);
+        }
+
+        private OpenApiSpecVersion GetVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                throw new ArgumentNullException(nameof(version));
+            }
+
+            if (version.Equals("v2", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return OpenApiSpecVersion.OpenApi2_0;
+            }
+
+            if (version.Equals("v3", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return OpenApiSpecVersion.OpenApi3_0;
+            }
+
+            throw new InvalidOperationException("Invalid Open API version");
+        }
+
+        private OpenApiFormat GetFormat(string format)
+        {
+            if (string.IsNullOrWhiteSpace(format))
+            {
+                throw new ArgumentNullException(nameof(format));
+            }
+
+            return Enum.TryParse(format, true, out OpenApiFormat result)
+                       ? result
+                       : throw new InvalidOperationException("Invalid Open API format");
         }
     }
 }
