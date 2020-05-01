@@ -12,6 +12,8 @@ using Numaka.Common;
 using EventStore.Repository;
 using EventStore.Repository.Contracts;
 using EventStore.Models;
+using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 [assembly: FunctionsStartup(typeof(EventStore.Functions.Startup))]
 
@@ -25,6 +27,10 @@ namespace EventStore.Functions
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
+            builder.Services.AddSingleton(new RenderOpenApiDocumentOptions(version: "v3", format: "Json", assembly: Assembly.GetExecutingAssembly()));
+            builder.Services.AddSingleton(new RenderSwaggerUIOptions());
+            builder.Services.AddSingleton(new OpenApiAppSettings(openApiInfo: GetOpenApiInfo()));
+
             builder.Services.AddSingleton<IValidator<AddSnapshot>, AddSnapshotValidator>();
             builder.Services.AddSingleton<IValidator<AppendEvents>, AppendEventsValidator>();
             builder.Services.AddSingleton<IValidator<NewEvent>, NewEventValidator>();
@@ -33,7 +39,7 @@ namespace EventStore.Functions
             builder.Services.AddSingleton<CorsMiddleware>();
             builder.Services.AddSingleton<ExceptionMiddleware>();   
             builder.Services.AddSingleton<SecurityMiddleware>();           
-            builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(openIdConnectMetadataAddress, clientId));
+            //builder.Services.AddSingleton<ITokenValidator>(new TokenValidator(openIdConnectMetadataAddress, clientId));
 
             builder.Services.AddSingleton<FindStreamHandler>();
             builder.Services.AddSingleton<GetAllStreamsHandler>();
@@ -51,6 +57,13 @@ namespace EventStore.Functions
             builder.Services.AddTransient<IStreamService, StreamService>();
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddTransient<IMiddlewarePipeline, MiddlewarePipeline>();
+
+            static OpenApiInfo GetOpenApiInfo() => new OpenApiInfo()
+            {
+                Title = "Event Store",
+                Description = "Event Store web API",
+                Version = "0.1"
+            };
         }
     }
 }
