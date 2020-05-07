@@ -33,9 +33,9 @@ namespace EventStore.Functions
                 };
         }
 
-        public Task<ClaimsPrincipal> ValidateAsync(string bearerToken)
+        public Task<ClaimsPrincipal> ValidateTokenAsync(string token)
         {
-            var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(bearerToken, _tokenValidationParameters, out _);
+            var claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(token, _tokenValidationParameters, out _);
 
             return Task.FromResult(claimsPrincipal);
         }

@@ -1,10 +1,9 @@
 using Numaka.Functions.Infrastructure;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.Logging;
 using EventStore.Core.Contracts;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -23,7 +22,7 @@ namespace EventStore.Functions.Middlewares
 
             var models = await _streamService.GetAllStreamsAsync();
             
-            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
+            context.ActionResult = new OkObjectResult(models);
         }
     }
 }

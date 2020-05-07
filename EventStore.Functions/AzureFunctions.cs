@@ -4,7 +4,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using EventStore.Functions.Middlewares;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
@@ -36,8 +35,8 @@ namespace EventStore.Functions
         [OpenApiOperation("get-snapshots", "EventStore")]
         [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Snapshot>), Description = "Get snapshots for the given stream")]
-        public Task<HttpResponseMessage> GetSnapshots(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> GetSnapshots(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<GetSnapshotsHandler>(request, logger);
 
         [FunctionName(nameof(GetEvents))]
@@ -45,47 +44,47 @@ namespace EventStore.Functions
         [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter(name: "startAtVersion", In = ParameterLocation.Query, Required = false, Type = typeof(int))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Event>))]
-        public Task<HttpResponseMessage> GetEvents(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> GetEvents(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<GetEventsHandler>(request, logger);
 
         [FunctionName(nameof(FindStream))]
         [OpenApiOperation("find-stream", "EventStore")]
         [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Stream))]
-        public Task<HttpResponseMessage> FindStream(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> FindStream(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<FindStreamHandler>(request, logger);
 
         [FunctionName(nameof(GetAllStreams))]
         [OpenApiOperation("get-all-streams", "EventStore")]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(IEnumerable<Stream>))]
-        public Task<HttpResponseMessage> GetAllStreams(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> GetAllStreams(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<GetAllStreamsHandler>(request, logger);
 
         [FunctionName(nameof(AppendEvents))]
         [OpenApiOperation("append-events", "EventStore")]
         [OpenApiRequestBody("application/json", typeof(AppendEvents))]
         [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
-        public Task<HttpResponseMessage> AppendEvents(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> AppendEvents(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<AppendEventsHandler>(request, logger);
 
         [FunctionName(nameof(AddSnapshot))]
         [OpenApiOperation("add-snapshots", "EventStore")]
         [OpenApiRequestBody("application/json", typeof(AddSnapshot))]
         [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
-        public Task<HttpResponseMessage> AddSnapshot(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> AddSnapshot(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<AddSnapshotHandler>(request, logger);
 
         [FunctionName(nameof(DeleteSnapshots))]
         [OpenApiOperation("delete-snapshots", "EventStore")]
         [OpenApiParameter(name: "streamName", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiResponseBody(HttpStatusCode.NoContent, "application/json", typeof(string))]
-        public Task<HttpResponseMessage> DeleteSnapshots(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "options")] HttpRequestMessage request, ILogger logger)
+        public Task<IActionResult> DeleteSnapshots(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "options")] HttpRequest request, ILogger logger)
             => ExecuteAsync<DeleteSnapshotsHandler>(request, logger);
 
         [FunctionName(nameof(RenderSwaggerDocument))]
@@ -138,7 +137,7 @@ namespace EventStore.Functions
             };
         }
 
-        private async Task<HttpResponseMessage> ExecuteAsync<TMiddleware>(HttpRequestMessage request, ILogger logger) where TMiddleware : HttpMiddleware
+        private async Task<IActionResult> ExecuteAsync<TMiddleware>(HttpRequest request, ILogger logger) where TMiddleware : HttpMiddleware
         {
             var bootstrapper = _serviceProvider.GetService<IHttpFunctionContextBootstrapper>();
             var pipeline = _serviceProvider.GetService<IMiddlewarePipeline>();
