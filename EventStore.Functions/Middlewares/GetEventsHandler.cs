@@ -1,10 +1,10 @@
 using Numaka.Functions.Infrastructure;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 using EventStore.Core.Contracts;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -21,15 +21,15 @@ namespace EventStore.Functions.Middlewares
         {
             context.Logger.LogInformation("Getting events...");
 
-            var values = context.Request.RequestUri.ParseQueryString();
+            context.Request.Query.TryGetValue("streamName", out StringValues streamName);
 
-            var streamName = values.Get("streamName");
+            context.Request.Query.TryGetValue("startAtVersion", out StringValues startAtVersionAsString);
 
-            int.TryParse(values.Get("startAtVersion"), out int startAtVersion);
+            int.TryParse(startAtVersionAsString, out int startAtVersion);
 
             var models = await _streamService.GetEventsAsync(streamName, startAtVersion);
 
-            context.Response = context.Request.CreateResponse(HttpStatusCode.OK, models);
+            context.ActionResult = new OkObjectResult(models);
         }
     }
 }

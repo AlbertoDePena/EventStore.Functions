@@ -3,9 +3,10 @@ using Numaka.Functions.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net;
 using EventStore.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace EventStore.Functions.Middlewares
 {
@@ -22,18 +23,22 @@ namespace EventStore.Functions.Middlewares
         {
             context.Logger.LogInformation("Adding snapshot...");
 
-            var model = await context.Request.Content.ReadAsAsync<AddSnapshot>();
+            using var reader = new StreamReader(context.Request.Body);
+
+            var json = await reader.ReadToEndAsync();
+
+            var model = JsonConvert.DeserializeObject<AddSnapshot>(json);
 
             if (model == null)
             {
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid payload");
+                context.ActionResult = new BadRequestObjectResult("Invalid payload");
 
                 return;
             }
 
             await _streamService.AddSnapshotAsync(model);
 
-            context.Response = context.Request.CreateResponse(HttpStatusCode.NoContent);
+            context.ActionResult = new NoContentResult();
         }
     }
 }
